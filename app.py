@@ -3,17 +3,18 @@ import streamlit as st
 st.title("Job Post Form")
 
 with st.form("job_form"):
-    job_title = st.text_input("Job Title")
+
+    job_title = st.text_input("職種タイトル")
     employment_type = st.selectbox(
-        "Employment Type",
+        "雇用形態",
         ["正社員", "業務委託", "アルバイト", "契約社員", "インターン"],
     )
-    location = st.text_input("Location")
-    job_description = st.text_area("Job Description")
-    required_skills = st.text_area("Required Skills")
-    preferred_skills = st.text_area("Preferred Skills")
-    salary = st.text_input("Salary / Compensation")
-    notes = st.text_area("Notes")
+    location = st.text_input("勤務地")
+    job_description = st.text_area("業務内容")
+    required_skills = st.text_area("必須スキル")
+    preferred_skills = st.text_area("歓迎スキル")
+    salary = st.text_input("想定年収・報酬")
+    notes = st.text_area("備考")
 
     submitted = st.form_submit_button("Submit")
 
