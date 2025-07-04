@@ -3,6 +3,7 @@ import streamlit as st
 st.title("Job Post Form")
 
 with st.form("job_form"):
+
     job_title = st.text_input("職種タイトル")
     employment_type = st.selectbox(
         "雇用形態",
