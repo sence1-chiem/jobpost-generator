@@ -82,3 +82,47 @@ with st.form("job_form"):
     submitted = st.form_submit_button("生成する")
 
 if submitted:
+    st.subheader("生成された求人票")
+    st.markdown(f"""
+### {job_title}
+
+**このポジションに期待すること**  
+{role_expectation}  
+{role_expectation_note}
+
+**募集の背景**  
+{hiring_reason}  
+{hiring_reason_note}
+
+**主な仕事内容**  
+{responsibilities}
+
+**必要なスキル・経験**  
+{required_skills}
+
+**向いている人物像**  
+{", ".join(suitable_personality)}  
+{personality_note}
+
+**雇用形態**  
+{", ".join(employment_type)}
+
+**勤務時間・休日**  
+{", ".join(work_style)}  
+{work_style_note}
+
+**給与**  
+{salary_type}：{salary_min}〜{salary_max}  
+{salary_note}
+
+**福利厚生**  
+{", ".join(benefits)}  
+{benefits_note}
+
+**出力フォーマット**  
+{output_format}
+
+**文体スタイル**  
+{tone}
+""")
+
