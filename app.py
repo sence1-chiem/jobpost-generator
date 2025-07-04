@@ -18,11 +18,27 @@ with st.form("job_form"):
     submitted = st.form_submit_button("Submit")
 
 if submitted:
-    st.write("職種タイトル:", job_title)
-    st.write("雇用形態:", employment_type)
-    st.write("勤務地:", location)
-    st.write("業務内容:", job_description)
-    st.write("必須スキル:", required_skills)
-    st.write("歓迎スキル:", preferred_skills)
-    st.write("想定年収・報酬:", salary)
-    st.write("備考:", notes)
+    # プレビュー表示を生成
+    preview = f"""
+### 職種タイトル
+{job_title} を募集しています。
+
+**雇用形態・勤務地**  
+雇用形態は {employment_type}、勤務地は {location} です。
+
+**業務内容**  
+{job_description}
+
+**必須スキル**  
+{required_skills}
+
+**歓迎スキル**  
+{preferred_skills}
+
+**想定年収・報酬**  
+{salary}
+
+**備考**  
+{notes}
+    """
+    st.markdown(preview)
