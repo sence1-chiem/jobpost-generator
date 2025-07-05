@@ -1,30 +1,52 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 
-// 1. FormKeys type: "Q1" through "Q12"
-export type FormKeys = `Q${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12}`;
-
-// 2. FormState type: each key maps to string
+// Define your form state types and initial state here
+type FormKeys = string; // adjust this type based on your actual keys
 export type FormState = {
-  [K in FormKeys]: string;
+  // ... your form state fields
 };
 
-// 3. initialFormState: all fields empty string
-export const initialFormState: FormState = {
-  Q1: "",
-  Q2: "",
-  Q3: "",
-  Q4: "",
-  Q5: "",
-  Q6: "",
-  Q7: "",
-  Q8: "",
-  Q9: "",
-  Q10: "",
-  Q11: "",
-  Q12: "",
+const initialFormState: FormState = {
+  // ... your initial form state
 };
 
-// 4. Context value type
+// Custom hook for persisted form state
+function usePersistedForm(key: string, initial: FormState): [FormState, (key: FormKeys, value: string) => void] {
+  const [values, setValues] = useState<FormState>(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem(key);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch {
+          // ignore parse error
+        }
+      }
+    }
+    return initial;
+  });
+
+  // Debounce logic
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      window.localStorage.setItem(key, JSON.stringify(values));
+    }, 300);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [key, values]);
+
+  const setValue = (field: FormKeys, value: string) => {
+    setValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  return [values, setValue];
+}
+
+// Define your context and provider here
 type FormContextType = {
   values: FormState;
   setValue: (key: FormKeys, value: string) => void;
@@ -32,33 +54,31 @@ type FormContextType = {
   reset: () => void;
 };
 
-// 5. Create context with undefined as default, using generic parameter
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
-// 6. Provider component
+export const useFormContext = () => {
+  const context = useContext(FormContext);
+  if (!context) {
+    throw new Error("useFormContext must be used within a ProvideFormContext");
+  }
+  return context;
+};
+
 export const ProvideFormContext = ({ children }: { children: ReactNode }) => {
-  const [values, setValues] = useState<FormState>(initialFormState);
+  const [values, setValue] = usePersistedForm("jobgen.form", initialFormState);
 
-  const setValue = (key: FormKeys, value: string) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const setAllValues = (newValues: FormState) => {
-    setValues(newValues);
+  const setValues = (newValues: FormState) => {
+    // Overwrite all values and persist
+    Object.entries(newValues).forEach(([k, v]: [string, unknown]) => setValue(k as FormKeys, v as string));
   };
 
   const reset = () => setValues(initialFormState);
 
   return (
-    <FormContext.Provider value={{ values, setValue, setValues: setAllValues, reset }}>
+    <FormContext.Provider value={{ values, setValue, setValues, reset }}>
       {children}
     </FormContext.Provider>
   );
 };
 
-// 7. useFormContext hook
-export const useFormContext = () => {
-  const ctx = useContext(FormContext);
-  if (!ctx) throw new Error("useFormContext must be used within ProvideFormContext");
-  return ctx;
-};
+// Your component code here
