@@ -288,48 +288,111 @@ const validators = {
 All 12 questions (Q1–Q12) are defined in `lib/questions.ts` with the following structure:
 
 ```ts
-export type Question = {
-  id: string;
-  label: string;
-  description?: string;
-  placeholder?: string;
-  required?: boolean;
-};
+[
+  {
+    id: "q1",
+    label: "どのような職種を募集したいですか？",
+    placeholder: "例：シニアソフトウエアエンジニア、フィールドセールスなど",
+    supplement: "具体的な役職名や職務タイトルを入力してください。"
+  },
+  {
+    id: "q2",
+    label: "そのポジションにどんな役割を期待していますか？",
+    placeholder: "例：事業の立ち上げ〜グロースの責任者",
+    supplement: "いま社内でどんな役割が不足していて、その人に何を担って欲しいかを書いてください。"
+  },
+  {
+    id: "q3",
+    label: "今回の募集に至った背景を教えてください",
+    placeholder: "例：新規事業の開始に伴い、○○の専任担当が必要になったため",
+    supplement: "人員補充、新しい挑戦など、採用に至るまでのストーリーがあると親切です。"
+  },
+  {
+    id: "q4",
+    label: "具体的にどんな業務をお願いする予定ですか？",
+    placeholder: "例：見込み顧客への初回商談・提案資料の作成・契約交渉 など",
+    supplement: "箇条書きで3〜5個程度が読みやすく、実態も伝わりやすくなります。"
+  },
+  {
+    id: "q5",
+    label: "その業務に必要なスキルや経験があれば教えてください",
+    placeholder: "例：無形商材の法人営業経験、SaaS営業の経験 など",
+    supplement: "箇条書きで3〜5個程度、現場の目線で書くのがおすすめです。"
+  },
+  {
+    id: "q6",
+    label: "どんな人がこの仕事に向いていそうですか？",
+    placeholder: "例：現場での試行錯誤が好きな方、決まった正解がない状況を楽しめる方 など",
+    supplement: "選択肢から選んだあとに、さらに自由記述で補足ができます。"
+  },
+  {
+    id: "q7",
+    label: "雇用形態について教えてください",
+    placeholder: "例：正社員／契約社員／業務委託など",
+    supplement: "複数選択可。検討中でも構いません。"
+  },
+  {
+    id: "q8",
+    label: "勤務時間や休日について教えてください",
+    placeholder: "例：フレックスタイム制（コアタイム11〜15時）、完全週休二日制（土日祝）",
+    supplement: "選択肢＋自由記述。働き方に特徴がある場合はぜひ記載を。"
+  },
+  {
+    id: "q9",
+    label: "想定している給与レンジがあれば教えてください",
+    placeholder: "例：月給30〜40万円／年収500〜700万円 など",
+    supplement: "形式（年収／月給）を選んで、金額レンジと補足を入力できます。"
+  },
+  {
+    id: "q10",
+    label: "その他、福利厚生や制度などで伝えておきたいことがあれば",
+    placeholder: "例：書籍購入制度・勉強会参加支援など",
+    supplement: "選択肢から選んだあとに、自由記述で補足できます。"
+  },
+  {
+    id: "q11",
+    label: "どの媒体向けに出力しますか？",
+    placeholder: "例：自社サイト／Indeed",
+    supplement: "文体や構成が切り替わります。"
+  },
+  {
+    id: "q12",
+    label: "文体の希望があれば教えてください（任意）",
+    placeholder: "例：丁寧め／やわらかめ／若者向け／固め など",
+    supplement: "明確な指定がない場合、媒体に応じたデフォルト文体が使われます。"
+  }
+]
 ```
-
-Example entries:
-
-```ts
-{
-  id: "q1",
-  label: "どのような職種を募集したいですか？",
-  placeholder: "例：シニアソフトウェアエンジニア、カスタマーサポートなど",
-  required: true
-},
-{
-  id: "q2",
-  label: "このポジションに期待する役割は？",
-  description: "ミッションや目的、どんな成果を期待するかを簡単に記載してください",
-  placeholder: "例：受発注管理、顧客対応、プロジェクト推進など"
-}
-```
-
+- Location: `lib/questions.ts`
+- Each question contains `id`, `label`, `placeholder`, and `supplement`
+- Used in Step1–4 form flows for dynamic rendering
+- Prepares the app for i18n expansion and easy UI copy management
 ---
 
 ### Error Messages Plan (lib/errorMessages.ts)
-
-Validation messages are defined in a centralized module:
+This module defines per-field validation messages, keyed by question ID.
 
 ```ts
 export const errorMessages = {
-  required: "入力は必須です",
-  minItems: (min: number) => `${min}項目以上入力してください`,
-  maxItems: (max: number) => `${max}項目以内で入力してください`,
-  invalidRange: "最小値は最大値以下にしてください",
+  q1: "この項目は必須です",
+  q2: "この項目は必須です",
+  q3: "この項目は必須です",
+  q4: "3〜5個の業務内容を入力してください",
+  q5: "3〜5個のスキルを入力してください",
+  q6: "少なくとも1つ選択してください",
+  q7: "少なくとも1つ選択してください",
+  q8: "少なくとも1つ選択してください",
+  q9: "最小金額を入力し、最大金額は最小以上にしてください",
+  q10: "少なくとも1つ選択してください",
+  q11: "出力媒体を選択してください",
+  q12: "文体の指定が不正です"
 };
 ```
 
-These are displayed via `shadcn/ui`'s `FormMessage` components when validation fails.
+- Location: `lib/errorMessages.ts`
+- Used by `validators.ts` and displayed via shadcn `<FormMessage />`
+- Maintains consistent UX and Japanese error tone
+- Easily updatable and localizable in the future
 
 ---
 
