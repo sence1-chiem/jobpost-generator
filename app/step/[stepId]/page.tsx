@@ -1,79 +1,130 @@
 "use client";
 
-import React from "react";
+import { useParams } from "next/navigation";
 import { useFormContext } from "../../../context/FormContext";
+import { questions } from "../../../lib/questions";
+import { errorMessages } from "../../../lib/errorMessages";
+import { validators } from "../../../lib/validators";
 import { Form } from "../../../components/ui/form";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
+import React, { useState } from "react";
 
-export default function Step1() {
+const stepQuestionMap: Record<string, string[]> = {
+  step1: ["q1", "q2", "q3"],
+  step2: ["q4", "q5", "q6"],
+  step3: ["q7", "q8", "q9", "q10"],
+  step4: ["q11", "q12"],
+};
+
+export default function StepPage() {
+  const params = useParams();
+  const stepId = params?.stepId as string;
   const { values, setValue } = useFormContext();
+
+  // Find which questions to show for this step
+  const questionIds = stepQuestionMap[stepId] || [];
+  const stepQuestions = questions.filter(q => questionIds.includes(q.id));
+
+  // Validation state
+  const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({} as Record<string, string>);
+
+  const handleChange = (id: string, value: string) => {
+    setValue(id.toUpperCase() as any, value);
+    // Validate on change if already touched
+    if (touched[id]) {
+      const error = validators[id]?.(value);
+      setErrors(prev => ({
+        ...prev,
+        [id]: error ? errorMessages[id as keyof typeof errorMessages] : "",
+      }));
+    }
+  };
+
+  const handleBlur = (id: string, value: string) => {
+    setTouched(prev => ({ ...prev, [id]: true }));
+    const error = validators[id]?.(value);
+    setErrors(prev => ({
+      ...prev,
+      [id]: error ? errorMessages[id as keyof typeof errorMessages] : "",
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigation will be handled later
+    // Validate all fields on submit
+    let hasError = false;
+    const newTouched: Record<string, boolean> = {};
+    const newErrors: Record<string, string> = {};
+    for (const q of stepQuestions) {
+      newTouched[q.id] = true;
+      const value = values[q.id.toUpperCase() as keyof typeof values];
+      const error = validators[q.id]?.(value);
+      if (error) {
+        hasError = true;
+        newErrors[q.id] = errorMessages[q.id as keyof typeof errorMessages];
+      } else {
+        newErrors[q.id] = "";
+      }
+    }
+    setTouched(newTouched);
+    setErrors(newErrors);
+    if (!hasError) {
+      // Navigation or next step logic here
+    }
   };
 
   return (
-    <Form>
-      <form onSubmit={handleSubmit} className="space-y-8 max-w-xl mx-auto mt-8">
-        {/* Q1 */}
-        <div>
-          <label htmlFor="q1" className="block font-medium mb-1">
-            募集職種タイトル <span className="text-red-500">*</span>
-          </label>
-          <Input
-            id="q1"
-            value={values.Q1}
-            onChange={e => setValue("Q1", e.target.value)}
-            placeholder="例：営業事務スタッフ"
-            required
-          />
-          <div className="text-sm text-muted-foreground mt-1">
-            例：営業事務スタッフ
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-xl mx-auto mt-8">
+      {stepQuestions.map(q => {
+        const value = values[q.id.toUpperCase() as keyof typeof values] || "";
+        const isTextarea =
+          q.id === "q3" ||
+          q.id === "q4" ||
+          q.id === "q5" ||
+          q.id === "q6" ||
+          q.id === "q10" ||
+          q.id === "q11" ||
+          q.id === "q12";
+        return (
+          <div key={q.id}>
+            <label htmlFor={q.id} className="block font-medium mb-1">
+              {q.label} <span className="text-red-500">*</span>
+            </label>
+            {isTextarea ? (
+              <Textarea
+                id={q.id}
+                value={value}
+                onChange={e => handleChange(q.id, e.target.value)}
+                onBlur={e => handleBlur(q.id, e.target.value)}
+                placeholder={q.placeholder}
+                required
+                rows={3}
+              />
+            ) : (
+              <Input
+                id={q.id}
+                value={value}
+                onChange={e => handleChange(q.id, e.target.value)}
+                onBlur={e => handleBlur(q.id, e.target.value)}
+                placeholder={q.placeholder}
+                required
+              />
+            )}
+            {q.supplement && (
+              <div className="text-sm text-muted-foreground mt-1">{q.supplement}</div>
+            )}
+            {errors[q.id] && (
+              <div className="text-sm text-red-500 mt-1">{errors[q.id]}</div>
+            )}
           </div>
-        </div>
-
-        {/* Q2 */}
-        <div>
-          <label htmlFor="q2" className="block font-medium mb-1">
-            想定される役割 <span className="text-red-500">*</span>
-          </label>
-          <Input
-            id="q2"
-            value={values.Q2}
-            onChange={e => setValue("Q2", e.target.value)}
-            placeholder="例：受発注管理、顧客対応"
-            required
-          />
-          <div className="text-sm text-muted-foreground mt-1">
-            例：受発注管理、顧客対応
-          </div>
-        </div>
-
-        {/* Q3 */}
-        <div>
-          <label htmlFor="q3" className="block font-medium mb-1">
-            募集背景 <span className="text-red-500">*</span>
-          </label>
-          <Textarea
-            id="q3"
-            value={values.Q3}
-            onChange={e => setValue("Q3", e.target.value)}
-            placeholder="例：事業拡大に伴う増員募集です。"
-            rows={3}
-            required
-          />
-          <div className="text-sm text-muted-foreground mt-1">
-            例：事業拡大に伴う増員募集です。
-          </div>
-        </div>
-
-        <Button type="submit" className="w-full mt-6">
-          次へ
-        </Button>
-      </form>
-    </Form>
+        );
+      })}
+      <Button type="submit" className="w-full mt-6">
+        次へ
+      </Button>
+    </form>
   );
 }
