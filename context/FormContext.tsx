@@ -32,7 +32,7 @@ type FormContextType = {
   reset: () => void;
 };
 
-// 5. Create context
+// 5. Create context with undefined as default, using generic parameter
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
 // 6. Provider component
@@ -43,10 +43,14 @@ export const ProvideFormContext = ({ children }: { children: ReactNode }) => {
     setValues((prev) => ({ ...prev, [key]: value }));
   };
 
+  const setAllValues = (newValues: FormState) => {
+    setValues(newValues);
+  };
+
   const reset = () => setValues(initialFormState);
 
   return (
-    <FormContext.Provider value={{ values, setValue, setValues, reset }}>
+    <FormContext.Provider value={{ values, setValue, setValues: setAllValues, reset }}>
       {children}
     </FormContext.Provider>
   );
