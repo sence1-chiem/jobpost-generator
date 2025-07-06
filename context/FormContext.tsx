@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 
 // Define your form state types and initial state here
