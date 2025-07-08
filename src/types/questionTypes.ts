@@ -3,26 +3,25 @@
 export type JobFormQuestion =
   | TextQuestion
   | CheckboxQuestion
-  | RadioQuestion
-  | RangeQuestion;
+  | OtherQuestionTypes;
+
+type OtherQuestionTypes = never; // Placeholder for future question types
 
 interface BaseQuestion {
   id: string;
-  step: number;
   label: string;
-  required: boolean;
   placeholder?: string;
-  guidance?: string; // UI supplement or help text
+  type: string;
+  guidance?: string;
 }
 
 export interface TextQuestion extends BaseQuestion {
-  type: "text";
   valueType: "string";
 }
 
 export interface CheckboxQuestion extends BaseQuestion {
-  type: "checkbox";
   valueType: "string[]";
+  type: "checkbox";
   choices: string[];
   maxChoices?: number;
   withSupplementField?: boolean;
@@ -30,13 +29,11 @@ export interface CheckboxQuestion extends BaseQuestion {
 }
 
 export interface RadioQuestion extends BaseQuestion {
-  type: "radio";
   valueType: "string";
   choices: string[];
 }
 
 export interface RangeQuestion extends BaseQuestion {
-  type: "range";
   valueType: "object";
   unitChoices: string[];
   minLabel: string;
