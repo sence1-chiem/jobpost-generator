@@ -28,7 +28,10 @@
     "baseUrl": "src",
     "paths": {
       "@/*": ["*"]
-    }
+    },
+
+    // types
+    "types": ["vitest/globals", "node"]
   },
   "include": [
     "next-env.d.ts",
