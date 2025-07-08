@@ -1,0 +1,10 @@
+{
+  "components": "src/components",
+  "utils": "src/lib/utils.ts",
+  "types": "src/types",
+  "tailwind": {
+    "config": "tailwind.config.ts",
+    "css": "src/styles/globals.css"
+  },
+  "rsc": false
+}

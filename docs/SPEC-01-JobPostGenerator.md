@@ -212,6 +212,9 @@ src/
 ├── docs/                         # Project documentation and specifications
 │   └── SPEC-01-JobPostGenerator.md
 │
+├── lib/
+│   └── utils.ts                   # Utility function for cn() using clsx + tailwind-merge (required by shadcn)
+│
 ├── .gitignore                    # Git exclusion rules
 ├── LICENSE                       # License file (optional)
 ├── README.md                     # (Recommended) Project overview

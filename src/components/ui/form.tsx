@@ -12,3 +12,21 @@ export function Form({ children, className = "", ...props }: FormProps) {
     </form>
   );
 }
+
+export function FormMessage({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <p className={`text-red-500 text-sm ${className}`}>
+      {children}
+    </p>
+  );
+}
+
+export function FormDescription({ className = "", children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <p className={`text-muted-foreground text-sm ${className}`}>
+      {children}
+    </p>
+  );
+}
+
+// ...other form exports...
